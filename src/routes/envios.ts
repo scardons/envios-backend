@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { listarEnvios, crearEnvio, listarRutas, listarTransportistas, asignarRuta } from "../controllers/enviosController";
 import { completarEnvio } from "../controllers/enviosController";
+import { obtenerEnviosConFiltros } from "../controllers/enviosController";
+
 
 import { actualizarEstadoEnvio } from "../controllers/enviosController";
 
@@ -28,6 +30,10 @@ router.post("/completar", completarEnvio);
 
 // 📌 Endpoint para actualizar el estado del envío
 router.put("/actualizar-estado", actualizarEstadoEnvio);
+
+// 📌 Endpoint para los filtros
+router.get("/envios", obtenerEnviosConFiltros);
+
 
 
 export default router;

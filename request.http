@@ -81,3 +81,7 @@ Content-Type: application/json
   "envio_id": 1
   
 }
+
+### Obtener envíos con filtros
+GET http://localhost:3000/api/envios?fechaInicio=2024-03-01&fechaFin=2024-03-29&estado=entregado&transportista=Juan Perez
+Accept: application/json
