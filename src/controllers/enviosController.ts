@@ -6,6 +6,7 @@ import { crearOrdenEnvio, obtenerOrdenesEnvio } from "../models/envioModel";
 import pool from "../config/db"; // 👈 Importa correctamente la conexión a la BD
 import { obtenerEstadoEnvioModel } from "../models/envioModel";
 import Redis from "ioredis";
+import { EnvioModel } from "../models/envioModel"; // Asegúrate de que esta ruta sea correcta
 
 import { actualizarEstadoEnvioModel } from "../models/envioModel";
 
@@ -171,6 +172,26 @@ export const actualizarEstadoEnvio = async (req: Request, res: Response): Promis
   } catch (error) {
     console.error("❌ Error al actualizar estado del envío:", error);
     res.status(500).json({ message: "Error interno del servidor", error });
+  }
+};
+
+//------------para los filtros avanzados
+
+export const obtenerEnviosConFiltros = async (req: Request, res: Response) => {
+  try {
+    const { fechaInicio, fechaFin, estado, transportista } = req.query;
+
+    const envios = await EnvioModel.obtenerEnviosFiltrados(
+      fechaInicio as string,
+      fechaFin as string,
+      estado as string,
+      transportista as string
+    );
+
+    res.json(envios);
+  } catch (error) {
+    console.error("Error al obtener envíos:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 };
 

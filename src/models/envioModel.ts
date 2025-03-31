@@ -134,8 +134,8 @@ export const obtenerEstadoEnvioModel = async (envio_id: number) => {
   return { estado, cache: false };
 };
 
-/*** ✅ COMPLETAR ENVÍO ***/
-// 📌 Marcar envío como completado y actualizar Redis
+/***  COMPLETAR ENVÍO ***/
+//  Marcar envío como completado y actualizar Redis
 export const completarEnvio = async (envio_id: number) => {
   const [envio]: any = await pool.query(
     "SELECT transportista_id FROM envios_rutas WHERE envio_id = ?",
@@ -203,12 +203,12 @@ export const completarEnvioModel = async (envio_id: number): Promise<boolean> =>
 
 
 
-// 📦 Actualizar el estado del envío ---------
+//Actualizar el estado del envío ---------
 
-// 📌 Definir el tipo del resultado de la consulta
+//  Definir el tipo del resultado de la consulta
 type Envio = { estado: string } | undefined;
 
-// 📦 Actualizar el estado del envío
+//  Actualizar el estado del envío
 export const actualizarEstadoEnvioModel = async (envio_id: number, nuevo_estado: string): Promise<boolean> => {
   try {
     // 🔹 Ejecutar la consulta y obtener los resultados con `as Envio[]`
@@ -243,3 +243,45 @@ const estadoActual = rows[0].estado; // ✅ Ahora TypeScript lo reconoce
     return false;
   }
 };
+
+//-------------------------------
+
+export class EnvioModel {
+  static async obtenerEnviosFiltrados(
+    fechaInicio?: string,
+    fechaFin?: string,
+    estado?: string,
+    transportista?: string
+  ): Promise<Envio[]> {
+    try {
+      let query = `
+        SELECT e.id, e.fecha_envio, e.estado, t.nombre AS transportista
+        FROM envios e
+        LEFT JOIN transportistas t ON e.transportista_id = t.id
+        WHERE 1=1
+      `;
+      const params: any[] = [];
+
+      if (fechaInicio && fechaFin) {
+        query += " AND e.fecha_envio BETWEEN ? AND ?";
+        params.push(fechaInicio, fechaFin);
+      }
+      if (estado) {
+        query += " AND e.estado = ?";
+        params.push(estado);
+      }
+      if (transportista) {
+        query += " AND t.nombre = ?";
+        params.push(transportista);
+      }
+
+      const [result] = await pool.execute(
+        `SELECT * FROM envios WHERE estado = ? LIMIT ? OFFSET ?`,
+        [estado, 10, 0] // Pasar los valores como parámetros
+      );
+            return result as Envio[];
+    } catch (error) {
+      throw new Error("Error al obtener envíos: " + error);
+    }
+  }
+}
