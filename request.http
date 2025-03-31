@@ -1,0 +1,83 @@
+###para registrar 
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Juan aaa",
+  "email": "juan@cacardsds.com",
+  "password": "123433356"
+}
+###para realizar el login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@example.com",
+  "password": "123456"
+}
+
+###//para verificar el token
+GET http://localhost:3000/api/protected-route
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqdWFuQGV4YW1wbGUuY29tIiwiaWF0IjoxNzQzMTkzMTQ1LCJleHAiOjE3NDMxOTY3NDV9.6kHWJvaXPdh0xe_Wqz7WtPDCDr3oAXS2-NEM6TTmc7Q
+
+### Prueba de envío de datos
+POST http://localhost:3000/api/enviar
+Content-Type: application/json
+
+{
+  "nombre": "Juan santo",
+  "email": "juan@example.com",
+  "mensaje": "Hola, este es un mensaje de prueba."
+}
+###Crear una orden de envio
+POST http://localhost:3000/api/envios
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "peso": 10.5,
+  "dimensiones": "30x40x50",
+  "tipo_producto": "Electrónica",
+  "direccion_destino": "Calle 123, Ciudad XYZ"
+}
+
+
+// el edn point del 3 punto
+
+
+### Asignar una ruta a un envío
+POST http://localhost:3000/api/envios/asignar-ruta
+Content-Type: application/json
+
+{
+  "envio_id": 1,
+  "ruta_id": 2,
+  "transportista_id": 3
+}
+
+### Obtener la lista de envíos
+GET http://localhost:3000/api/envios
+Content-Type: application/json
+
+### Obtener la lista de rutas disponibles
+GET http://localhost:3000/api/envios/rutas
+Content-Type: application/json
+
+### Obtener la lista de transportistas disponibles
+GET http://localhost:3000/api/envios/transportistas
+Content-Type: application/json
+
+### 🔹 Obtener el estado de un envío (Reemplaza `1` con un ID real)
+### punto 4 ● Endpoint para consultar el estado actual de un envío por ID.
+GET http://localhost:3000/api/envios-auth/estado/1
+Content-Type: application/json
+
+
+###LA API PARA CAMBIAR DE EN ESPERA A ENTREGADO 
+POST http://localhost:3000/api/envios/completar
+Content-Type: application/json
+
+{
+  "envio_id": 1
+  
+}

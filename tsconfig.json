@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    /* Directorios de entrada y salida */
+    "rootDir": "./src",     /* Carpeta donde está tu código TypeScript */
+    "outDir": "./dist",     /* Carpeta donde se guardarán los archivos compilados en JavaScript */
+
+    /* Configuración del compilador */
+    "target": "ES6",        /* Versión de JavaScript a la que se compilará */
+    "module": "CommonJS",   /* Tipo de módulo (para Node.js usa CommonJS) */
+    "esModuleInterop": true, /* Permite importar módulos de CommonJS de manera más sencilla */
+    "forceConsistentCasingInFileNames": true, /* Asegura que los imports respeten mayúsculas y minúsculas */
+    "strict": true,         /* Activa todas las verificaciones estrictas de TypeScript */
+    "skipLibCheck": true    /* Evita verificar los tipos de las librerías externas */
+  },
+  "include": ["src"],       /* Le indica a TypeScript qué carpetas debe compilar */
+  "exclude": ["node_modules"] /* Excluye la carpeta node_modules para evitar errores */
+}
