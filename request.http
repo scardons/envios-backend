@@ -3,9 +3,9 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Juan aaa",
-  "email": "juan@cacardsds.com",
-  "password": "123433356"
+  "name": "Juana aaa",
+  "email": "juanssgthsa@cacardsds.com",
+  "password": "1234333we56"
 }
 ###para realizar el login
 POST http://localhost:3000/api/auth/login
@@ -18,17 +18,17 @@ Content-Type: application/json
 
 ###//para verificar el token
 GET http://localhost:3000/api/protected-route
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqdWFuQGV4YW1wbGUuY29tIiwiaWF0IjoxNzQzMTkzMTQ1LCJleHAiOjE3NDMxOTY3NDV9.6kHWJvaXPdh0xe_Wqz7WtPDCDr3oAXS2-NEM6TTmc7Q
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqdWFuQGV4YW1wbGUuY29tIiwiaWF0IjoxNzQzNDQ1OTY1LCJleHAiOjE3NDM0NDk1NjV9.s1gZChc4BDQAA-J8DIxH1QvX5qNTe3E78809HxHXlSA
 
-### Prueba de envío de datos
-POST http://localhost:3000/api/enviar
-Content-Type: application/json
+# ### Prueba de envío de datos
+# POST http://localhost:3000/api/enviar
+# Content-Type: application/json
 
-{
-  "nombre": "Juan santo",
-  "email": "juan@example.com",
-  "mensaje": "Hola, este es un mensaje de prueba."
-}
+# {
+#   "nombre": "Juan santo",
+#   "email": "juan@example.com",
+#   "mensaje": "Hola, este es un mensaje de prueba."
+# }
 ###Crear una orden de envio
 POST http://localhost:3000/api/envios
 Content-Type: application/json
@@ -45,15 +45,16 @@ Content-Type: application/json
 // el edn point del 3 punto
 
 
-### Asignar una ruta a un envío
+### Asignar una ruta a un envío 
 POST http://localhost:3000/api/envios/asignar-ruta
 Content-Type: application/json
 
 {
-  "envio_id": 1,
-  "ruta_id": 2,
-  "transportista_id": 3
+  "envio_id": 2,
+  "ruta_id": 1,
+  "transportista_id": 7
 }
+
 
 ### Obtener la lista de envíos
 GET http://localhost:3000/api/envios
@@ -67,6 +68,28 @@ Content-Type: application/json
 GET http://localhost:3000/api/envios/transportistas
 Content-Type: application/json
 
+
+{
+  "envio_id": 1
+  
+}
+///punto 5
+### Obtener envíos con filtros
+GET http://localhost:3000/api/envios?fechaInicio=2024-03-01&fechaFin=2024-03-29&estado=entregado&transportista=Juan Perez
+Accept: application/json
+
+//punto 4
+### Obtener historial de un envío (Reemplaza `1` con un ID real)
+GET http://localhost:3000/api/seguimiento/historial/1
+Content-Type: application/json
+
+###
+POST http://localhost:3000/api/envios/completar
+Content-Type: application/json
+
+{
+  "envio_id": 1
+}
 ### 🔹 Obtener el estado de un envío (Reemplaza `1` con un ID real)
 ### punto 4 ● Endpoint para consultar el estado actual de un envío por ID.
 GET http://localhost:3000/api/envios-auth/estado/1
@@ -76,12 +99,5 @@ Content-Type: application/json
 ###LA API PARA CAMBIAR DE EN ESPERA A ENTREGADO 
 POST http://localhost:3000/api/envios/completar
 Content-Type: application/json
-
-{
-  "envio_id": 1
-  
-}
-
-### Obtener envíos con filtros
-GET http://localhost:3000/api/envios?fechaInicio=2024-03-01&fechaFin=2024-03-29&estado=entregado&transportista=Juan Perez
-Accept: application/json
+###
+GET http://localhost:3000/api/seguimiento/historial/{envioId}

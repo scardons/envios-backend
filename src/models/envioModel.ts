@@ -1,7 +1,7 @@
 import pool from "../config/db"; // Conexión a MySQL
 import Redis from "ioredis"; // Cliente de Redis
 import { RowDataPacket } from "mysql2/promise";
-
+const redis = new Redis(); // Se conecta a Redis en localhost:6379 por defecto
 
 
 /*** 🏷 INTERFACES ***/
@@ -48,6 +48,8 @@ export const obtenerRutas = async () => {
   return rutas;
 };
 
+
+
 // 📌 Obtener transportistas disponibles
 export const obtenerTransportistas = async () => {
   const [transportistas]: any = await pool.query(
@@ -56,24 +58,29 @@ export const obtenerTransportistas = async () => {
   return transportistas;
 };
 
-// 📌 Asignar un envío a una ruta y transportista
+
+
 export const asignarRutaEnvio = async (envio_id: number, ruta_id: number, transportista_id: number) => {
   const [enviosAsignados]: any = await pool.query(
-    "SELECT id FROM envios_rutas WHERE transportista_id = ? AND estado IN ('Asignado', 'En ruta')",
+    "SELECT id FROM envios_rutas WHERE transportista_id = ? AND estado = 'En ruta'",
     [transportista_id]
   );
 
   if (enviosAsignados.length > 0) {
-    throw new Error("❌ El transportista ya tiene un envío activo.");
+    throw new Error("❌ El transportista ya tiene un envío en ruta.");
   }
 
   const [envio]: any = await pool.query(
-    "SELECT peso FROM ordenes_envio WHERE id = ?",
+    "SELECT estado FROM ordenes_envio WHERE id = ?",
     [envio_id]
   );
 
   if (envio.length === 0) {
     throw new Error("❌ Envío no encontrado.");
+  }
+
+  if (envio[0].estado !== "En espera") {
+    throw new Error("❌ El envío ya fue asignado o está en tránsito.");
   }
 
   await pool.query(
@@ -83,12 +90,13 @@ export const asignarRutaEnvio = async (envio_id: number, ruta_id: number, transp
 
   await pool.query("UPDATE transportistas SET disponible = 0 WHERE id = ?", [transportista_id]);
 
-  // 🔹 Una vez asignado, el transportista comienza el viaje → Cambia estado a "En tránsito"
-  await actualizarEstadoEnvio(envio_id, "En tránsito");
+  // 🔹 Cambia el estado del pedido en `ordenes_envio` a "Asignado"
+  await pool.query("UPDATE ordenes_envio SET estado = 'Asignado' WHERE id = ?", [envio_id]);
 
-  return { mensaje: "✅ Envío asignado y ahora está en tránsito." };
+  return { mensaje: "✅ Envío asignado correctamente." };
 };
 
+// ---------------------------- numero 4
 
 /*** 🔎 CONSULTA DE ENVÍOS Y ESTADOS ***/
 // 📌 Obtener lista de envíos con su estado actual
@@ -107,7 +115,7 @@ export const listarEnvios = async () => {
 
 //------------- modo redis activado para optimizar------------
 
-const redis = new Redis(); // Se conecta a Redis en localhost:6379 por defecto
+
 
 /*** 🟢 CREAR Y ACTUALIZAR ESTADOS EN REDIS ***/
 // 📌 Guardar estado en Redis

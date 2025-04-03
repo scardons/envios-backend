@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import { TextField, Button, Container, Typography, Box, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -7,12 +7,12 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -39,44 +39,57 @@ const Login = () => {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" gutterBottom>
-        Iniciar Sesión
-      </Typography>
-      {error && (
-        <Typography color="error" variant="body1">
-          {error}
+      <Paper elevation={3} sx={{ padding: 4, borderRadius: 2, textAlign: "center" }}>
+        <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
+          Iniciar Sesión
         </Typography>
-      )}
-      <form onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          margin="normal"
-        />
-        <TextField
-          fullWidth
-          label="Contraseña"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-          margin="normal"
-        />
+        {error && (
+          <Typography color="error" variant="body1" mb={2}>
+            {error}
+          </Typography>
+        )}
+        <form onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            margin="normal"
+            variant="outlined"
+          />
+          <TextField
+            fullWidth
+            label="Contraseña"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            margin="normal"
+            variant="outlined"
+          />
 
-        {/* Botones alineados horizontalmente */}
-        <Box display="flex" justifyContent="space-between" mt={2}>
-          <Button variant="contained" color="primary" type="submit">
-            Iniciar Sesión
-          </Button>
-          <Button variant="outlined" color="secondary" onClick={() => navigate("/register")}>
-            CREAR USUARIO
-          </Button>
-        </Box>
-      </form>
+          <Box display="flex" justifyContent="space-between" mt={3}>
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              sx={{ fontWeight: "bold", borderRadius: 2, paddingX: 3 }}
+            >
+              Iniciar Sesión
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate("/register")}
+              sx={{ fontWeight: "bold", borderRadius: 2, paddingX: 3, borderWidth: 2 }}
+            >
+              Crear Usuario
+            </Button>
+          </Box>
+        </form>
+      </Paper>
     </Container>
   );
 };

@@ -11,7 +11,7 @@ import { EnvioModel } from "../models/envioModel"; // Asegúrate de que esta rut
 import { actualizarEstadoEnvioModel } from "../models/envioModel";
 
 
-const redis = new Redis(); // Usar el puerto 6379 por defecto
+const redis = new Redis(); 
 
 export default redis;
 
@@ -31,24 +31,6 @@ export const crearEnvio = async (req: Request, res: Response) => {
 };
 
   
-
-export const listarEnvios = async (_req: Request, res: Response) => {
-  try {
-    const query = `
-      SELECT oe.id, oe.usuario_id, oe.peso, oe.dimensiones, oe.tipo_producto, oe.direccion_destino, 
-             COALESCE(er.estado, 'En espera') AS estado, 
-             er.ruta_id, er.transportista_id
-      FROM ordenes_envio oe
-      LEFT JOIN envios_rutas er ON oe.id = er.envio_id
-    `;
-
-    const [envios] = await pool.query(query);
-    res.json({ message: "Lista de envíos", envios });
-  } catch (error) {
-    console.error("❌ Error al obtener envíos:", error);
-    res.status(500).json({ message: "Error al obtener envíos", error });
-  }
-};
 
 //-----------------------------------------------------
 // 📌 Obtener rutas disponibles
@@ -73,7 +55,7 @@ export const listarTransportistas = async (_req: Request, res: Response) => {
   }
 };
 
-// 📌 Asignar ruta a un envío
+
 export const asignarRuta = async (req: Request, res: Response): Promise<void> => { 
   try {
     console.log("📦 Datos recibidos para asignar ruta:", req.body); // 👀 Ver qué está llegando
@@ -88,13 +70,18 @@ export const asignarRuta = async (req: Request, res: Response): Promise<void> =>
 
     const resultado = await asignarRutaEnvio(envio_id, ruta_id, transportista_id);
     res.status(201).json(resultado);
-  } catch (error) {
-    console.error("❌ Error al asignar ruta:", error); // 🛑 Muestra errores en la terminal
-    res.status(500).json({ message: "Error interno del servidor", error });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("❌ Error al asignar ruta:", error); // 🛑 Muestra errores en la terminal
+      res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    } else {
+      console.error("❌ Error desconocido:", error);
+      res.status(500).json({ message: "Error interno del servidor", error: "Error desconocido" });
+    }
   }
 };
 
-//---------------------------- 4 punto ----------------
+
 
 
 export const obtenerEstadoEnvio = async (req: Request, res: Response): Promise<void> => {
@@ -143,9 +130,7 @@ export const completarEnvio = async (req: Request, res: Response): Promise<void>
   }
 };
 
-//actualizar estado 
 
-// 🔹 Actualizar el estado del envío
 export const actualizarEstadoEnvio = async (req: Request, res: Response): Promise<void> => {
   try {
     const { envio_id, nuevo_estado } = req.body;
@@ -175,7 +160,7 @@ export const actualizarEstadoEnvio = async (req: Request, res: Response): Promis
   }
 };
 
-//------------para los filtros avanzados
+//------------para los filtros avanzados 5
 
 export const obtenerEnviosConFiltros = async (req: Request, res: Response) => {
   try {
@@ -196,3 +181,39 @@ export const obtenerEnviosConFiltros = async (req: Request, res: Response) => {
 };
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const listarEnvios = async (_req: Request, res: Response) => {
+  try {
+    const query = `
+      SELECT oe.id, oe.usuario_id, oe.peso, oe.dimensiones, oe.tipo_producto, oe.direccion_destino, 
+             COALESCE(er.estado, 'En espera') AS estado, 
+             er.ruta_id, er.transportista_id
+      FROM ordenes_envio oe
+      LEFT JOIN envios_rutas er ON oe.id = er.envio_id
+    `;
+
+    const [envios] = await pool.query(query);
+    res.json({ message: "Lista de envíos", envios });
+  } catch (error) {
+    console.error("❌ Error al obtener envíos:", error);
+    res.status(500).json({ message: "Error al obtener envíos", error });
+  }
+};

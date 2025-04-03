@@ -1,6 +1,6 @@
 import express from "express";
-import { verifyToken } from "../middlewares/authMiddleware"; // Importa el middleware
-import { AuthRequest } from "../middlewares/authMiddleware"; // Importa el tipo
+import { verifyToken } from "../middlewares/authMiddleware"; 
+import { AuthRequest } from "../middlewares/authMiddleware"; 
 
 const router = express.Router();
 

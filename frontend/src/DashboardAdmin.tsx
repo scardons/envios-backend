@@ -16,12 +16,12 @@ const DashboardAdmin = () => {
 
   useEffect(() => {
     cargarOrdenes();
-  }, [estadoFiltro]);
+  }, []);
 
   const cargarOrdenes = async () => {
     setLoading(true);
     setError(null);
-  
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:3000/api/envios", {
@@ -30,18 +30,17 @@ const DashboardAdmin = () => {
           "Content-Type": "application/json",
         },
       });
-  
-      // 📌 Verifica si la respuesta es JSON antes de intentar parsearla
+
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         throw new Error("La respuesta no es JSON, revisar el servidor");
       }
-  
+
       if (!response.ok) {
-        const errorText = await response.text(); // Obtén la respuesta como texto
+        const errorText = await response.text();
         throw new Error(`Error ${response.status}: ${errorText}`);
       }
-  
+
       const data = await response.json();
       console.log("🚀 Envíos recibidos:", data);
       setOrdenes(data.envios || []);
@@ -52,12 +51,13 @@ const DashboardAdmin = () => {
       setLoading(false);
     }
   };
-  
 
   const asignarRuta = async (idOrden: number) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`/api/envios/asignar-ruta`, {
+      console.log("📡 Enviando solicitud para asignar ruta a la orden:", idOrden);
+  
+      const response = await fetch("http://localhost:3000/api/envios/asignar-ruta", {
         method: "POST",
         body: JSON.stringify({ envio_id: idOrden, ruta_id: 1, transportista_id: 2 }),
         headers: {
@@ -65,16 +65,32 @@ const DashboardAdmin = () => {
           "Content-Type": "application/json",
         },
       });
-
-      if (!response.ok) throw new Error("Error al asignar ruta");
-      const data = await response.json();
+  
+      const textResponse = await response.text();
+      console.log("📩 Respuesta del servidor:", textResponse);
+  
+      if (!response.ok) {
+        throw new Error(`Error en API: ${response.status} - ${textResponse}`);
+      }
+  
+      const data = JSON.parse(textResponse);
       alert(data.mensaje);
-      cargarOrdenes();
+  
+      // 🔹 Actualizar el estado local sin recargar
+      setOrdenes((prevOrdenes) =>
+        prevOrdenes.map((orden) =>
+          orden.id === idOrden ? { ...orden, estado: "Asignado" } : orden
+        )
+      );
     } catch (error) {
       console.error("❌ Error al asignar ruta:", error);
       alert("No se pudo asignar la ruta. Inténtalo nuevamente.");
     }
   };
+  
+  
+  
+  
 
   return (
     <div className="p-6">
@@ -88,7 +104,7 @@ const DashboardAdmin = () => {
         <option value="Asignado">Asignado</option>
         <option value="Completado">Completado</option>
       </select>
-      
+
       {loading && <p className="text-blue-500">Cargando órdenes...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
@@ -102,24 +118,30 @@ const DashboardAdmin = () => {
           </tr>
         </thead>
         <tbody>
-          {ordenes.length > 0 ? (
-            ordenes.map((orden) => (
-              <tr key={orden.id} className="border">
-                <td className="border p-2">{orden.id}</td>
-                <td className="border p-2">{orden.direccion_destino}</td>
-                <td className="border p-2">{orden.estado}</td>
-                <td className="border p-2">
-                  {orden.estado === "En espera" && (
-                    <button
-                      onClick={() => asignarRuta(orden.id)}
+          {ordenes.filter((orden) => orden.estado === estadoFiltro).length > 0 ? (
+            ordenes
+              .filter((orden) => orden.estado === estadoFiltro)
+              .map((orden) => (
+                <tr key={orden.id} className="border">
+                  <td className="border p-2">{orden.id}</td>
+                  <td className="border p-2">{orden.direccion_destino}</td>
+                  <td className="border p-2">{orden.estado}</td>
+                  <td className="border p-2">
+                    {orden.estado === "En espera" && (
+                      <button
+                      onClick={() => {
+                        console.log("🖱 Botón clickeado para ID:", orden.id);
+                        asignarRuta(orden.id);
+                      }}
                       className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                     >
                       Asignar Ruta
                     </button>
-                  )}
-                </td>
-              </tr>
-            ))
+                    
+                    )}
+                  </td>
+                </tr>
+              ))
           ) : (
             <tr>
               <td colSpan={4} className="text-center p-4">

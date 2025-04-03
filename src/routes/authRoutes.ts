@@ -6,7 +6,6 @@ import { createUser, getUserByEmail } from "../models/userModel";
 
 const router = express.Router();
 
-// Definir la estructura del usuario para TypeScript
 interface User {
   id: number;
   name: string;
@@ -14,7 +13,6 @@ interface User {
   password: string;
 }
 
-// Endpoint Registro de usuario
 router.post(
   "/register",
   [
@@ -32,17 +30,14 @@ router.post(
     const { name, email, password } = req.body;
 
     try {
-      // Verificar si el usuario ya existe
       const existingUser = await getUserByEmail(email);
       if (existingUser) {
         res.status(400).json({ message: "El email ya está registrado" });
         return;
       }
 
-      // Hash de la contraseña
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Crear usuario
       await createUser({ name, email, password: hashedPassword });
 
       res.status(201).json({ message: "Usuario registrado correctamente" });
@@ -53,7 +48,6 @@ router.post(
   }
 );
 
-// Login de usuario
 router.post(
   "/login",
   [

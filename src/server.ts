@@ -8,27 +8,34 @@ import authRoutes from "./routes/authRoutes";
 import protectedRoutes from "./routes/protected";
 import envios from "./routes/envios";
 import enviosRoutes from "./routes/enviosAutentic";
+import seguimientoRoutes from "./routes/seguimientoRoutes";
 
 // Configurar variables de entorno
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app); // 🆕 Crear servidor HTTP
+const server = http.createServer(app); 
+
+// 🔹 **Mantén solo UNA instancia de `io`**
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, 
   },
+  transports: ["websocket", "polling"], 
 });
+
 
 console.log("🔑 JWT_SECRET:", process.env.JWT_SECRET || "No detectado");
 
-// Middleware
 app.use(express.json());
 app.use(cors({
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, 
 }));
 app.use(helmet());
 
@@ -37,10 +44,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api", protectedRoutes);
 app.use("/api/envios", envios);
 app.use("/api/envios-auth", enviosRoutes);
+app.use("/api/seguimiento", seguimientoRoutes);
 
-// WebSockets: Detectar conexiones
 io.on("connection", (socket) => {
-  console.log("🟢 Cliente conectado a WebSockets");
+  console.log("🟢 Cliente conectado a WebSockets con ID:", socket.id);
 
   socket.on("disconnect", () => {
     console.log("🔴 Cliente desconectado de WebSockets");
@@ -58,5 +65,5 @@ server.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
 });
 
-// Exportar `io` para usarlo en otros archivos
+// Exportar `io` para usarlo en otros archivos si es necesario
 export { io };
